@@ -26,7 +26,7 @@ foreach ($stmt as $row) {
     $description = $row["description"];
     $merchant = $row["merchant"];
     $category = $row["category"];
-    $amount = $row["amount"];
+    $amount = (double)$row["amount"];
 
 
     $total_spend += $amount;
