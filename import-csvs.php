@@ -9,17 +9,18 @@ $user = 'mike';
 $password = '';
 $table = 'apple_card';
 
-/*
+// connect to the database
+$dsn = "pgsql:host=$host;port=$port;dbname=$dbname;";
+$pdo = new PDO($dsn, $user, $password, [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]);
 
-CREATE TABLE apple_card 
+// create the table if it doesn't exist
+$sql = "
+ CREATE TABLE IF NOT EXISTS apple_card 
  ( hash CHAR(32), txn_date DATE, clearing_date DATE, description VARCHAR(255), 
    merchant VARCHAR(255), category VARCHAR(100), amount real, primary key(hash)
  );
-
-*/
-
-$dsn = "pgsql:host=$host;port=$port;dbname=$dbname;";
-$pdo = new PDO($dsn, $user, $password, [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]);
+";
+$pdo->exec($sql); 
 
 // Open the directory
 if (is_dir($directory)) {
