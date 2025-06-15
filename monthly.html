@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Monthly Apple Card Spend</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    #spendChart {
+      max-width: 100%;
+      height: 60vh;
+    }
+
+    h2 {
+      text-align: center;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <h2>Monthly Apple Card Spend</h2>
+  <canvas id="spendChart"></canvas>
+
+  <script>
+    function formatCurrency(amount) {
+      return "$" + amount.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatMonthLabel(monthStr) {
+      const [year, month] = monthStr.split("-");
+      const date = new Date(year, month - 1);
+      return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    }
+
+    fetch('https://digitalcleavage.com/dashboard/rest/monthly/')
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(item => formatMonthLabel(item.month));
+        const values = data.map(item => item.spend);
+
+        const ctx = document.getElementById('spendChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Monthly Spend',
+              data: values,
+              backgroundColor: 'rgba(0, 200, 255, 0.7)',
+              borderColor: 'rgba(0, 200, 255, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  title: function(context) {
+                    return context[0].label;
+                  },
+                  label: function(context) {
+                    return 'Spend: ' + formatCurrency(context.raw);
+                  }
+                },
+                backgroundColor: '#333',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#555',
+                borderWidth: 1
+              },
+              legend: {
+                labels: {
+                  color: '#ccc'
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  color: '#ccc'
+                },
+                grid: {
+                  color: '#444'
+                }
+              },
+              y: {
+                ticks: {
+                  color: '#ccc',
+                  callback: function(value) {
+                    return '$' + value.toLocaleString();
+                  }
+                },
+                grid: {
+                  color: '#444'
+                },
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+  </script>
+</body>
+</html>
